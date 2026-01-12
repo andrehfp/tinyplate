@@ -19,6 +19,15 @@ Este arquivo fornece instruções ao Claude Code quando trabalhando neste reposi
 | Stripe | `/stripe` | Pagamentos internacionais |
 | AbacatePay | `/abacatepay` | Pagamentos PIX (Brasil) |
 
+## Commands Disponíveis
+
+| Command | Descrição |
+|---------|-----------|
+| `/commit` | Stage all changes e cria commit com mensagem AI |
+| `/push` | Push da branch atual para o remote |
+| `/pr` | Cria Pull Request no GitHub |
+| `/ship` | Commit + Push + PR em um só comando |
+
 ## Agents Disponíveis
 
 | Agent | Descrição |
