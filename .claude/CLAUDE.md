@@ -18,6 +18,7 @@ Este arquivo fornece instruções ao Claude Code quando trabalhando neste reposi
 | UX Design | `/ux-design` | UX Design (princípios Apple) |
 | Stripe | `/stripe` | Pagamentos internacionais |
 | AbacatePay | `/abacatepay` | Pagamentos PIX (Brasil) |
+| Cloudflare | `/cloudflare` | DNS, domínios, email routing |
 
 ## Commands Disponíveis
 
@@ -94,6 +95,15 @@ Pagamentos PIX para Brasil:
 - QR Code PIX
 - Webhooks
 - Subscriptions
+
+### Cloudflare
+```bash
+/cloudflare
+```
+Setup de domínios:
+- DNS records (Clerk, Vercel)
+- Email routing e redirects
+- Verificação de propagação
 
 ## Segurança
 

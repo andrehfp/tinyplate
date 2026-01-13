@@ -1,4 +1,4 @@
-# tiny-boiler
+# tinyplate
 
 Boilerplate de skills do Claude Code para projetos Next.js.
 
@@ -11,8 +11,8 @@ Uma coleção de skills e agents pré-configurados para o Claude Code, prontos p
 ### 1. Clone o repositório
 
 ```bash
-git clone git@github.com:andrehfp/tiny-boiler.git
-cd tiny-boiler
+git clone git@github.com:andrehfp/tinyplate.git
+cd tinyplate
 ```
 
 ### 2. Copie a pasta `.claude/` para seu projeto
