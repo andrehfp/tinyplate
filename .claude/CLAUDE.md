@@ -18,7 +18,7 @@ Este arquivo fornece instruções ao Claude Code quando trabalhando neste reposi
 | UX Design | `/ux-design` | UX Design (princípios Apple) |
 | Stripe | `/stripe` | Pagamentos internacionais |
 | AbacatePay | `/abacatepay` | Pagamentos PIX (Brasil) |
-| Cloudflare | `/cloudflare` | DNS, domínios, email routing |
+| Cloudflare | `/cloudflare` | DNS, domínios, email routing, R2 storage |
 | Favicon | `/favicon` | Geração de favicons e app icons |
 
 ## Commands Disponíveis
@@ -101,9 +101,10 @@ Pagamentos PIX para Brasil:
 ```bash
 /cloudflare
 ```
-Setup de domínios:
+Setup de domínios e storage:
 - DNS records (Clerk, Vercel)
 - Email routing e redirects
+- R2 buckets (CORS, public access, custom domains)
 - Verificação de propagação
 
 ### Favicon

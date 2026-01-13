@@ -4,9 +4,9 @@ description: "Setup domains in Cloudflare with DNS for Clerk, Vercel, and email 
 allowed-tools: Read, Glob, Grep, Write, Edit, Bash, WebSearch
 ---
 
-# Cloudflare Domain Setup
+# Cloudflare Setup
 
-Automate the complete domain setup workflow: Cloudflare DNS, Clerk integration, Vercel deployment, and email routing.
+Automate Cloudflare workflows: DNS setup, Clerk integration, Vercel deployment, email routing, and R2 storage.
 
 ## Prerequisites
 
@@ -25,6 +25,7 @@ Required permissions:
 - Zone:Zone:Read
 - Email Routing Addresses:Edit
 - Email Routing Rules:Edit
+- Account:R2:Edit (for R2 storage)
 
 **Option 2: Wrangler CLI**
 ```bash
@@ -283,3 +284,147 @@ curl -X GET "https://api.cloudflare.com/client/v4/zones" \
 curl -X DELETE "https://api.cloudflare.com/client/v4/zones/ZONE_ID/dns_records/RECORD_ID" \
   -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"
 ```
+
+---
+
+# R2 Storage Setup
+
+Setup R2 buckets for file storage: user uploads, static assets, backups.
+
+## R2 Workflow
+
+### Step 1: Determine Use Case
+
+Ask the user:
+```
+What do you want to do with R2?
+1. Create new bucket (full setup)
+2. Configure existing bucket (CORS, public access)
+3. Setup custom domain for bucket
+```
+
+### Step 2: Gather Bucket Info
+
+```
+Bucket name?
+> my-app-uploads
+
+What will this bucket store?
+1. User uploads (images, files) - needs CORS + presigned URLs
+2. Static assets (public CDN) - needs public access
+3. Backups (private) - no public access
+> 1
+
+Custom domain? (optional, press enter to skip)
+> uploads.myapp.com
+```
+
+### Step 3: Create Bucket
+
+```bash
+# Create bucket via wrangler
+wrangler r2 bucket create my-app-uploads
+
+# Or via API
+curl -X PUT "https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets" \
+  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{"name": "my-app-uploads", "locationHint": "wnam"}'
+```
+
+### Step 4: Configure CORS (for user uploads)
+
+Create `cors.json`:
+```json
+{
+  "corsRules": [
+    {
+      "allowedOrigins": ["https://myapp.com", "http://localhost:3000"],
+      "allowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
+      "allowedHeaders": ["*"],
+      "exposeHeaders": ["ETag", "Content-Length"],
+      "maxAgeSeconds": 3600
+    }
+  ]
+}
+```
+
+Apply CORS:
+```bash
+wrangler r2 bucket cors put my-app-uploads --file=cors.json
+```
+
+### Step 5: Setup Public Access (for static assets)
+
+Option A: Enable R2.dev subdomain (via dashboard)
+- Go to R2 > Bucket > Settings > Public access
+
+Option B: Custom domain:
+```bash
+# Add CNAME record
+curl -X POST "https://api.cloudflare.com/client/v4/zones/ZONE_ID/dns_records" \
+  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "type": "CNAME",
+    "name": "uploads",
+    "content": "{account_id}.r2.cloudflarestorage.com",
+    "ttl": 1,
+    "proxied": true
+  }'
+```
+
+Then enable custom domain in R2 bucket settings.
+
+### Step 6: Generate S3 API Credentials (for SDK access)
+
+1. Go to R2 > Manage R2 API Tokens
+2. Create token with Object Read & Write
+3. Add to `.env.local`:
+
+```bash
+R2_ACCESS_KEY_ID="your-access-key"
+R2_SECRET_ACCESS_KEY="your-secret-key"
+R2_ENDPOINT="https://{account_id}.r2.cloudflarestorage.com"
+R2_BUCKET_NAME="my-app-uploads"
+```
+
+## R2 Quick Commands
+
+```bash
+# List buckets
+wrangler r2 bucket list
+
+# Create bucket
+wrangler r2 bucket create BUCKET_NAME
+
+# Delete bucket
+wrangler r2 bucket delete BUCKET_NAME
+
+# List objects
+wrangler r2 object list BUCKET_NAME
+
+# Upload file
+wrangler r2 object put BUCKET_NAME/path/file.png --file=./local.png
+
+# View CORS config
+wrangler r2 bucket cors get BUCKET_NAME
+```
+
+## R2 Use Case Presets
+
+| Use Case | CORS | Public | Custom Domain |
+|----------|------|--------|---------------|
+| User uploads | Yes | No | Optional |
+| Static assets/CDN | No | Yes | Recommended |
+| Backups | No | No | No |
+| Public downloads | No | Yes | Optional |
+
+## R2 Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| CORS error in browser | Add domain to allowedOrigins |
+| 403 Forbidden | Check API token has R2:Edit permission |
+| Custom domain not working | Ensure CNAME is proxied (orange cloud) |
+| Upload fails | Verify Content-Type header matches file |
