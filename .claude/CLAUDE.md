@@ -19,6 +19,7 @@ Este arquivo fornece instruções ao Claude Code quando trabalhando neste reposi
 | Stripe | `/stripe` | Pagamentos internacionais |
 | AbacatePay | `/abacatepay` | Pagamentos PIX (Brasil) |
 | Cloudflare | `/cloudflare` | DNS, domínios, email routing |
+| Favicon | `/favicon` | Geração de favicons e app icons |
 
 ## Commands Disponíveis
 
@@ -104,6 +105,16 @@ Setup de domínios:
 - DNS records (Clerk, Vercel)
 - Email routing e redirects
 - Verificação de propagação
+
+### Favicon
+```bash
+/favicon
+```
+Geração de favicons:
+- Todos os tamanhos (16, 32, 180, 192, 512)
+- Apple touch icon e Android chrome
+- Web manifest para PWA
+- Configuração de metadata Next.js
 
 ## Segurança
 
